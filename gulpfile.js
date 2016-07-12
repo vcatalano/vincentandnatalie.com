@@ -108,10 +108,6 @@ gulp.task('imgmin', function () {
     .pipe(gulp.dest('dist/img'));
 });
 
-//gulp.task('s3Sync', function() {
-//    return shell.task(['aws s3 sync --profile=personal --acl=public-read --region=us-west-2 . s3://vincentandnatalie.com'], { cwd: 'dist', verbose: true })
-//});
-
 gulp.task('s3Sync', shell.task(['aws s3 sync --profile=personal --acl=public-read --region=us-west-2 . s3://vincentandnatalie.com'], { cwd: 'dist' }));
 
 //command: 'aws s3 sync --profile=personal --acl=public-read --region=us-west-2 . s3://vincentcatalano.com', //--content-encoding="gzip"
