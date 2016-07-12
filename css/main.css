@@ -26,7 +26,7 @@
 }
 
 .hero { 
-  background: url(../img/hero-desktop-bg.jpg) no-repeat center center fixed; 
+  background: url(../img/hero-desktop-bg.jpg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -106,7 +106,7 @@
 
 .registry {
     background: #363b48;
-    background: url(../img/registry-bg.jpg) no-repeat center center fixed; 
+    background: url(../img/registry-bg.jpg) no-repeat center center fixed;
 }
 
 .registry-locations a {
@@ -144,7 +144,7 @@
 
 .rsvp-header {
     height: 400px;
-    background: url(../img/nv-walking-2.jpg) no-repeat center center fixed; 
+    background: url(../img/nv-walking-2.jpg) no-repeat center center fixed;
 }
 
 .rsvp-form {
@@ -167,7 +167,7 @@ footer p {
 
 @media (max-width: 767px) {
     .hero { 
-      background: url(../img/mobile-hero.jpg) no-repeat center center fixed; 
+      background: url(../img/mobile-hero.jpg) no-repeat center center fixed;
       -webkit-background-size: cover;
       -moz-background-size: cover;
       -o-background-size: cover;

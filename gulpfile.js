@@ -16,7 +16,8 @@ var gulp        = require('gulp'),
     pngquant    = require('imagemin-pngquant'),
     plumber     = require('gulp-plumber'),
     notify      = require('gulp-notify'),
-    shell       = require('gulp-shell');
+    shell       = require('gulp-shell'),
+    sequence    = require('gulp-sequence');
 
 
 gulp.task('css', function() {
@@ -33,7 +34,7 @@ gulp.task('css', function() {
   return gulp.src('css/*')
     .pipe(plumber({errorHandler: onError}))
     //.pipe(sass())
-    .pipe(concatCss("styles/bundle.css"))
+    .pipe(concatCss('styles/bundle.css', { rebaseUrls: false }))
     .pipe(size({ gzip: true, showFiles: true }))
     .pipe(prefix())
     .pipe(rename('main.css'))
@@ -59,12 +60,17 @@ gulp.task('deploy', function () {
 });
 
 gulp.task('js', function() {
-  gulp.src('js/*.js')
+  return gulp.src('js/*.js')
     .pipe(uglify())
     .pipe(size({ gzip: true, showFiles: true }))
     .pipe(concat('j.js'))
     .pipe(gulp.dest('dist/js'))
     .pipe(reload({stream:true}));
+});
+
+gulp.task('copy', function () {
+  return gulp.src('favicon.ico')
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('minify-html', function() {
@@ -73,14 +79,14 @@ gulp.task('minify-html', function() {
       spare:true
     };
 
-  gulp.src('./*.html')
+  return gulp.src('./*.html')
     .pipe(minifyHTML(opts))
     .pipe(gulp.dest('dist/'))
     .pipe(reload({stream:true}));
 });
 
 gulp.task('jshint', function() {
-  gulp.src('js/*.js')
+  return gulp.src('js/*.js')
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });
@@ -93,23 +99,25 @@ gulp.task('watch', function() {
 });
 
 gulp.task('imgmin', function () {
-    return gulp.src('img/*')
-        .pipe(imagemin({
-            progressive: true,
-            svgoPlugins: [{removeViewBox: false}],
-            use: [pngquant()]
-        }))
-        .pipe(gulp.dest('dist/img'));
+  return gulp.src('img/*')
+    .pipe(imagemin({
+          progressive: true,
+          svgoPlugins: [{removeViewBox: false}],
+          use: [pngquant()]
+    }))
+    .pipe(gulp.dest('dist/img'));
 });
 
-gulp.task('s3Sync', shell.task([
-  'aws s3 sync --profile=personal --acl=public-read --region=us-west-2 . s3://vincentandnatalie.com'
-], {
-    cwd: 'dist'
-}));
+//gulp.task('s3Sync', function() {
+//    return shell.task(['aws s3 sync --profile=personal --acl=public-read --region=us-west-2 . s3://vincentandnatalie.com'], { cwd: 'dist', verbose: true })
+//});
+
+gulp.task('s3Sync', shell.task(['aws s3 sync --profile=personal --acl=public-read --region=us-west-2 . s3://vincentandnatalie.com'], { cwd: 'dist' }));
 
 //command: 'aws s3 sync --profile=personal --acl=public-read --region=us-west-2 . s3://vincentcatalano.com', //--content-encoding="gzip"
 
-gulp.task('default', ['browser-sync', 'js', 'imgmin', 'minify-html', 'css', 'watch']);
+gulp.task('default', ['js', 'imgmin', 'minify-html', 'css', 'copy', 'watch', 'browser-sync']);
 
-gulp.task('deploy', ['js', 'imgmin', 'minify-html', 'css', 's3Sync']);
+gulp.task('build', ['js', 'imgmin', 'minify-html', 'css', 'copy']);
+
+gulp.task('deploy', sequence(['js', 'imgmin', 'minify-html', 'css'], 's3Sync'));
